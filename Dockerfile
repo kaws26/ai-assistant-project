@@ -37,6 +37,7 @@ ENV DATABASE_URL="sqlite:///./data/assistant.db"
 ENV ENVIRONMENT="production"
 ENV DEBUG="False"
 ENV PORT=10000
+ENV BACKEND_URL=""
 
 # Run the startup script
 CMD ["/app/start.sh"] 

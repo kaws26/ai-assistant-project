@@ -16,6 +16,43 @@ st.set_page_config(
 # Get backend URL from environment or use relative path
 BACKEND_URL = os.getenv("BACKEND_URL", "")
 
+# Add custom CSS
+st.markdown("""
+    <style>
+    .stApp {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .chat-message {
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        flex-direction: column;
+    }
+    .chat-message.user {
+        background-color: #2b313e;
+    }
+    .chat-message.assistant {
+        background-color: #475063;
+    }
+    .chat-message .content {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+    }
+    .chat-message .avatar {
+        width: 2rem;
+        height: 2rem;
+        margin-right: 1rem;
+    }
+    .chat-message .message {
+        flex: 1;
+        color: white;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 def main():
     st.title("AI Assistant 🤖")
     
@@ -39,16 +76,20 @@ def main():
         try:
             response = requests.post(
                 f"{BACKEND_URL}/api/generate",
-                json={"message": prompt},
+                json={"query": prompt, "user_id": os.getenv("USER_ID", "default_user")},
                 headers={"X-User-ID": os.getenv("USER_ID", "default_user")}
             )
             response.raise_for_status()
-            ai_response = response.json()["response"]
+            data = response.json()
             
-            # Add AI response to chat history
-            st.session_state.messages.append({"role": "assistant", "content": ai_response})
+            # Add AI responses to chat history
+            st.session_state.messages.append({"role": "assistant", "content": data["casual_response"]})
             with st.chat_message("assistant"):
-                st.write(ai_response)
+                st.write(data["casual_response"])
+                
+            st.session_state.messages.append({"role": "assistant", "content": data["formal_response"]})
+            with st.chat_message("assistant"):
+                st.write(data["formal_response"])
         except Exception as e:
             st.error(f"Error: {str(e)}")
 
