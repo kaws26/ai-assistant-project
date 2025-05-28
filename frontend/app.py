@@ -84,6 +84,13 @@ st.markdown(
         align-items: center;
         margin: 2em 0;
     }
+    .main-container {
+        background: #fff;
+        border-radius: 16px;
+        padding: 2em 2em 1.5em 2em;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        margin-bottom: 2em;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -138,9 +145,7 @@ with st.sidebar:
         st.info("No history yet. Your conversations will appear here.")
 
 # Main form
-st.markdown("""
-    <div style='background: #fff; border-radius: 16px; padding: 2em 2em 1.5em 2em; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom:2em;'>
-""", unsafe_allow_html=True)
+st.markdown('<div class="main-container">', unsafe_allow_html=True)
 with st.form("input_form"):
     query = st.text_area(
         "Enter your query:",
@@ -190,7 +195,7 @@ if submitted:
                 st.success(f"Generated in {time.time()-start_time:.2f}s")
             except requests.exceptions.RequestException as e:
                 st.error(f"API Error: {str(e)}")
-st.markdown("</div>", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Footer
 st.markdown(
