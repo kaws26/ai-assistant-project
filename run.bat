@@ -3,6 +3,10 @@
 REM Build the Docker image
 docker build -t ai-assistant .
 
+REM Stop and remove existing container if it exists
+docker stop ai-assistant 2>nul
+docker rm ai-assistant 2>nul
+
 REM Run the container
 docker run -d ^
   --name ai-assistant ^
