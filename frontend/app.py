@@ -2,7 +2,6 @@ import streamlit as st
 import requests
 from datetime import datetime
 import time
-from streamlit_extras.stylable_container import stylable_container
 import os
 from dotenv import load_dotenv
 
@@ -139,56 +138,59 @@ with st.sidebar:
         st.info("No history yet. Your conversations will appear here.")
 
 # Main form
-with stylable_container(key="main-form", css_styles="background: #fff; border-radius: 16px; padding: 2em 2em 1.5em 2em; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom:2em;"):
-    with st.form("input_form"):
-        query = st.text_area(
-            "Enter your query:",
-            placeholder="Explain quantum computing...",
-            key="query_input",
-        )
-        submitted = st.form_submit_button("✨ Generate Response", use_container_width=True)
+st.markdown("""
+    <div style='background: #fff; border-radius: 16px; padding: 2em 2em 1.5em 2em; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom:2em;'>
+""", unsafe_allow_html=True)
+with st.form("input_form"):
+    query = st.text_area(
+        "Enter your query:",
+        placeholder="Explain quantum computing...",
+        key="query_input",
+    )
+    submitted = st.form_submit_button("✨ Generate Response", use_container_width=True)
 
-    if submitted:
-        if not query.strip():
-            st.error("Please enter a query")
-        else:
-            with st.spinner("Generating responses..."):
-                start_time = time.time()
-                try:
-                    response = requests.post(
-                        f"{BACKEND_URL}/generate",
-                        json={"user_id": st.session_state.user_id, "query": query}
+if submitted:
+    if not query.strip():
+        st.error("Please enter a query")
+    else:
+        with st.spinner("Generating responses..."):
+            start_time = time.time()
+            try:
+                response = requests.post(
+                    f"{BACKEND_URL}/generate",
+                    json={"user_id": st.session_state.user_id, "query": query}
+                )
+                response.raise_for_status()
+                data = response.json()
+                
+                # Show loading spinner
+                st.markdown("""
+                    <div class='loading-spinner'>
+                        <div class='spinner'></div>
+                    </div>
+                """, unsafe_allow_html=True)
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown(
+                        f"<div class='response-box'><span style='font-size:1.5em;'>🎭</span> <b>Casual Response</b><br>{data['casual_response']}</div>",
+                        unsafe_allow_html=True,
                     )
-                    response.raise_for_status()
-                    data = response.json()
-                    
-                    # Show loading spinner
-                    st.markdown("""
-                        <div class='loading-spinner'>
-                            <div class='spinner'></div>
-                        </div>
-                    """, unsafe_allow_html=True)
-                    
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.markdown(
-                            f"<div class='response-box'><span style='font-size:1.5em;'>🎭</span> <b>Casual Response</b><br>{data['casual_response']}</div>",
-                            unsafe_allow_html=True,
-                        )
-                    with col2:
-                        st.markdown(
-                            f"<div class='response-box'><span style='font-size:1.5em;'>📚</span> <b>Formal Response</b><br>{data['formal_response']}</div>",
-                            unsafe_allow_html=True,
-                        )
-                    st.session_state.history.insert(0, {
-                        "query": query,
-                        "casual": data['casual_response'],
-                        "formal": data['formal_response'],
-                        "time": datetime.now().strftime("%H:%M:%S")
-                    })
-                    st.success(f"Generated in {time.time()-start_time:.2f}s")
-                except requests.exceptions.RequestException as e:
-                    st.error(f"API Error: {str(e)}")
+                with col2:
+                    st.markdown(
+                        f"<div class='response-box'><span style='font-size:1.5em;'>📚</span> <b>Formal Response</b><br>{data['formal_response']}</div>",
+                        unsafe_allow_html=True,
+                    )
+                st.session_state.history.insert(0, {
+                    "query": query,
+                    "casual": data['casual_response'],
+                    "formal": data['formal_response'],
+                    "time": datetime.now().strftime("%H:%M:%S")
+                })
+                st.success(f"Generated in {time.time()-start_time:.2f}s")
+            except requests.exceptions.RequestException as e:
+                st.error(f"API Error: {str(e)}")
+st.markdown("</div>", unsafe_allow_html=True)
 
 # Footer
 st.markdown(
