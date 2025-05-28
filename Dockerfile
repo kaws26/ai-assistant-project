@@ -7,19 +7,19 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Create necessary directories
+RUN mkdir -p /app/frontend /app/backend /app/data
+
 # Copy requirements files
-COPY frontend/requirements.txt frontend-requirements.txt
-COPY backend/requirements.txt backend-requirements.txt
+COPY frontend/requirements.txt /app/frontend-requirements.txt
+COPY backend/requirements.txt /app/backend-requirements.txt
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r frontend-requirements.txt -r backend-requirements.txt
+RUN pip install --no-cache-dir -r /app/frontend-requirements.txt -r /app/backend-requirements.txt
 
 # Copy application files
-COPY frontend /app/frontend
-COPY backend /app/backend
-
-# Create data directory for SQLite
-RUN mkdir -p /app/data
+COPY frontend/ /app/frontend/
+COPY backend/ /app/backend/
 
 # Create startup script
 RUN echo '#!/bin/bash\n\
