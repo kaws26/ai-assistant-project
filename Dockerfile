@@ -27,6 +27,7 @@ COPY backend /app/backend
 # Create startup script
 RUN echo '#!/bin/bash\n\
 cd /app\n\
+export PYTHONPATH=/app\n\
 uvicorn backend.main:app --host 0.0.0.0 --port 8000 &\n\
 streamlit run frontend/app.py --server.port 8501 --server.address 0.0.0.0\n\
 ' > /app/start.sh && chmod +x /app/start.sh
@@ -42,6 +43,7 @@ ENV ENVIRONMENT="production"
 ENV DEBUG="False"
 ENV PORT=8000
 ENV BACKEND_URL="http://localhost:8000"
+ENV PYTHONPATH=/app
 
 # Run the startup script
 CMD ["/app/start.sh"] 
