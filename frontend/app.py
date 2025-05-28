@@ -85,6 +85,13 @@ st.markdown(
         align-items: center;
         margin: 2em 0;
     }
+    .main-form {
+        background: #fff;
+        border-radius: 16px;
+        padding: 2em 2em 1.5em 2em;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        margin-bottom: 2em;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -139,7 +146,7 @@ with st.sidebar:
         st.info("No history yet. Your conversations will appear here.")
 
 # Main form
-with stylable_container(key="main-form", css_styles="background: #fff; border-radius: 16px; padding: 2em 2em 1.5em 2em; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom:2em;"):
+with stylable_container(class_name="main-form"):
     with st.form("input_form"):
         query = st.text_area(
             "Enter your query:",
