@@ -21,33 +21,14 @@ RUN pip install --no-cache-dir -r /app/frontend-requirements.txt -r /app/backend
 COPY frontend/ /app/frontend/
 COPY backend/ /app/backend/
 
-# Create startup script with proper networking
+# Create startup script
 RUN echo '#!/bin/bash\n\
-echo "Starting backend..."\n\
-cd /app/backend && uvicorn main:app --host 0.0.0.0 --port 8000 &\n\
-BACKEND_PID=$!\n\
-\n\
-echo "Starting frontend..."\n\
-cd /app/frontend && streamlit run app.py --server.port=8501 --server.address=0.0.0.0 --browser.serverAddress=0.0.0.0 --server.baseUrlPath=/ &\n\
-FRONTEND_PID=$!\n\
-\n\
-# Function to handle shutdown\n\
-function cleanup() {\n\
-    echo "Shutting down..."\n\
-    kill $BACKEND_PID\n\
-    kill $FRONTEND_PID\n\
-    exit 0\n\
-}\n\
-\n\
-# Trap SIGTERM and SIGINT\n\
-trap cleanup SIGTERM SIGINT\n\
-\n\
-# Keep container running\n\
-wait\n\
+echo "Starting application..."\n\
+cd /app/backend && uvicorn main:app --host 0.0.0.0 --port $PORT\n\
 ' > /app/start.sh && chmod +x /app/start.sh
 
-# Expose ports
-EXPOSE 8000 8501
+# Expose port (will be overridden by Render)
+EXPOSE 10000
 
 # Set environment variables
 ENV GROQ_API_KEY=""
@@ -55,10 +36,7 @@ ENV USER_ID="default_user"
 ENV DATABASE_URL="sqlite:///./data/assistant.db"
 ENV ENVIRONMENT="production"
 ENV DEBUG="False"
-ENV BACKEND_URL="http://localhost:8000"
-ENV STREAMLIT_SERVER_PORT=8501
-ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
-ENV STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+ENV PORT=10000
 
 # Run the startup script
 CMD ["/app/start.sh"] 
