@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: ai-assistant
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: USER_ID
+        value: default_user
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "False"
+    healthCheckPath: /api/health
+    autoDeploy: true 
